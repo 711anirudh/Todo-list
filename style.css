@@ -51,13 +51,39 @@ button:hover{
     background-color: #c40856;
 }
 .Modify_task{
-    display:flex;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 5px;
-    align-items:flex-end ;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: rgb(236, 178, 192);
+    border-radius: 5px;
+    font-size: 12px;
 }
+
+.Modify_task h5{
+    flex: 1;
+    font-size: 16px;
+}
+
+.com{
+    background-color: rgb(115, 224, 115);
+    padding: 5px 8px;
+}
+
+.com:hover{
+    background-color: darkgreen;
+}
+
 .del{
-    color:white;
-    border : none;
-    background-color: red;
-    
+    background-color: rgb(202, 8, 8);
+    padding: 5px 8px;
+}
+
+.del:hover{
+    background-color: darkred;
+}
+.update{
+    padding: 5px 8px;
 }
