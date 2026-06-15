@@ -47,19 +47,17 @@ button{
     border-radius: 5px;
     cursor: pointer;
 }
-
 button:hover{
     background-color: #c40856;
 }
-
-.task-list{
-    list-style-type: none;
+.Modify_task{
+    display:flex;
+    gap: 5px;
+    align-items:flex-end ;
 }
-
-.task-list li{
-    background-color: #f9f9f9;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border-left: 5px solid #4CAF50;
+.del{
+    color:white;
+    border : none;
+    background-color: red;
+    
 }
