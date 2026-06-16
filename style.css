@@ -50,21 +50,16 @@ button{
 button:hover{
     background-color: #c40856;
 }
-.Modify_task{
-    display: flex;
+.task{
+    display: grid;
     align-items: center;
-    justify-content: space-between;
+    grid-template-columns: 1fr auto;
     gap: 5px;
     margin-bottom: 10px;
     padding: 10px;
     background-color: rgb(236, 178, 192);
     border-radius: 5px;
     font-size: 12px;
-}
-
-.Modify_task h5{
-    flex: 1;
-    font-size: 16px;
 }
 
 .com{
@@ -86,4 +81,9 @@ button:hover{
 }
 .update{
     padding: 5px 8px;
+}
+.buttons{
+    display:flex;
+    justify-content: space-between;
+    gap:10px;
 }
