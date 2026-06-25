@@ -1,48 +1,28 @@
-// Selecting elements
-const input = document.querySelector("input");
-const addButton = document.querySelector(".input-section button");
-const container = document.querySelector(".container");
-const journalBtn = document.querySelector("#journalBtn");
+const input=document.querySelector("input");
+const addButton=document.querySelector(".input-section button");
+const container=document.querySelector(".container");
+const journalBtn=document.querySelector("#journalBtn");
+let firstTaskAdded=false;
 
-let firstTaskAdded = false;
-
-// -----------------------------
-// Add Task
-// -----------------------------
-addButton.addEventListener("click", addTask);
-
-// Press Enter to add task
-input.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        addTask();
-    }
-});
-
-function addTask() {
-
-    const taskText = input.value.trim();
-
-    if (taskText === "") {
-        alert("Please enter a task!");
-        return;
-    }
-
-    // Remove dummy tasks only once
-    if (!firstTaskAdded) {
-        document.querySelectorAll(".dummy").forEach(function (task) {
-            task.remove();
+function saveTasks(){
+    const tasks=[];
+    document.querySelectorAll(".task").forEach(task=>{
+        if(task.classList.contains("dummy")) return;
+        tasks.push({
+            text:task.querySelector("p").textContent,
+            completed:task.classList.contains("completed")
         });
+    });
+    localStorage.setItem("tasks",JSON.stringify(tasks));
+}
 
-        firstTaskAdded = true;
-    }
-
-    // Create task
-    const task = document.createElement("div");
+function createTask(taskText,completed=false){
+    const task=document.createElement("div");
     task.classList.add("task");
+    if(completed) task.classList.add("completed");
 
-    task.innerHTML = `
+    task.innerHTML=`
         <p>${taskText}</p>
-
         <div class="buttons">
             <button class="com">Completed</button>
             <button class="update">Update</button>
@@ -50,83 +30,110 @@ function addTask() {
         </div>
     `;
 
-    // Insert BEFORE journal button
-    const journalSection = document.querySelector(".journal-section");
-    container.insertBefore(task, journalSection);
+    const journalSection=document.querySelector(".journal-section");
 
-    input.value = "";
+    if(completed){
+        container.insertBefore(task,journalSection);
+    }else{
+        const completedTasks=document.querySelectorAll(".completed");
+        if(completedTasks.length>0){
+            container.insertBefore(task,completedTasks[0]);
+        }else{
+            container.insertBefore(task,journalSection);
+        }
+    }
 
     attachEvents(task);
+
+    if(completed){
+        task.querySelector(".com").disabled=true;
+    }
 }
 
-// -----------------------------
-// Attach button events
-// -----------------------------
-function attachEvents(task) {
+function loadTasks(){
+    const savedTasks=JSON.parse(localStorage.getItem("tasks"));
+    if(savedTasks===null) return;
 
-    const completeBtn = task.querySelector(".com");
-    const updateBtn = task.querySelector(".update");
-    const deleteBtn = task.querySelector(".del");
+    document.querySelectorAll(".dummy").forEach(task=>task.remove());
+    firstTaskAdded=true;
 
-    // -------------------------
-    // Completed
-    // -------------------------
-    completeBtn.addEventListener("click", function () {
+    savedTasks
+        .filter(task=>!task.completed)
+        .forEach(task=>createTask(task.text,false));
 
+    savedTasks
+        .filter(task=>task.completed)
+        .forEach(task=>createTask(task.text,true));
+}
+
+function addTask(){
+    const taskText=input.value.trim();
+
+    if(taskText===""){
+        alert("Please enter a task!");
+        return;
+    }
+
+    if(!firstTaskAdded){
+        document.querySelectorAll(".dummy").forEach(task=>task.remove());
+        firstTaskAdded=true;
+    }
+
+    createTask(taskText,false);
+    saveTasks();
+    input.value="";
+}
+
+function attachEvents(task){
+    const completeBtn=task.querySelector(".com");
+    const updateBtn=task.querySelector(".update");
+    const deleteBtn=task.querySelector(".del");
+
+    if(task.classList.contains("completed")){
+        completeBtn.disabled=true;
+    }
+
+    completeBtn.addEventListener("click",function(){
         task.classList.add("completed");
-
-        // Move task to bottom
-        const journalSection = document.querySelector(".journal-section");
-        container.insertBefore(task, journalSection);
-
-        completeBtn.disabled = true;
-        completeBtn.textContent = "Completed";
+        const journalSection=document.querySelector(".journal-section");
+        container.insertBefore(task,journalSection);
+        completeBtn.disabled=true;
+        saveTasks();
     });
 
-    // -------------------------
-    // Delete
-    // -------------------------
-    deleteBtn.addEventListener("click", function () {
-        task.remove();
-    });
+    updateBtn.addEventListener("click",function(){
+        const paragraph=task.querySelector("p");
+        const updatedText=prompt("Update your task:",paragraph.textContent);
 
-    // -------------------------
-    // Update
-    // -------------------------
-    updateBtn.addEventListener("click", function () {
+        if(updatedText===null) return;
 
-        const paragraph = task.querySelector("p");
-
-        const updatedText = prompt(
-            "Update your task:",
-            paragraph.textContent
-        );
-
-        if (updatedText === null) {
-            return;
-        }
-
-        if (updatedText.trim() === "") {
+        if(updatedText.trim()===""){
             alert("Task cannot be empty!");
             return;
         }
 
-        paragraph.textContent = updatedText.trim();
-
+        paragraph.textContent=updatedText.trim();
+        saveTasks();
     });
 
+    deleteBtn.addEventListener("click",function(){
+        task.remove();
+        saveTasks();
+    });
 }
 
-// -----------------------------
-// Existing dummy tasks
-// -----------------------------
-document.querySelectorAll(".task").forEach(function (task) {
-    attachEvents(task);
+addButton.addEventListener("click",addTask);
+
+input.addEventListener("keydown",function(event){
+    if(event.key==="Enter"){
+        addTask();
+    }
 });
 
-// -----------------------------
-// Journal Button
-// -----------------------------
-journalBtn.addEventListener("click", function () {
-    window.location.href = "journal.html";
+document.querySelectorAll(".task").forEach(task=>attachEvents(task));
+
+journalBtn.addEventListener("click",function(){
+    window.location.href="journal.html";
 });
+
+loadTasks();
