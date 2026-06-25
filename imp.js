@@ -1,69 +1,132 @@
-// Selecting elements from HTML
+// Selecting elements
 const input = document.querySelector("input");
 const addButton = document.querySelector(".input-section button");
 const container = document.querySelector(".container");
+const journalBtn = document.querySelector("#journalBtn");
 
-// Add task when Add Task button is clicked
-addButton.addEventListener("click", function () {
+let firstTaskAdded = false;
 
-    // Get the text entered by the user
-    const taskText = input.value;
+// -----------------------------
+// Add Task
+// -----------------------------
+addButton.addEventListener("click", addTask);
 
-    // Prevent empty tasks
+// Press Enter to add task
+input.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        addTask();
+    }
+});
+
+function addTask() {
+
+    const taskText = input.value.trim();
+
     if (taskText === "") {
         alert("Please enter a task!");
         return;
     }
 
-    // Create task div
+    // Remove dummy tasks only once
+    if (!firstTaskAdded) {
+        document.querySelectorAll(".dummy").forEach(function (task) {
+            task.remove();
+        });
+
+        firstTaskAdded = true;
+    }
+
+    // Create task
     const task = document.createElement("div");
     task.classList.add("task");
 
-    // Add HTML inside the task div
     task.innerHTML = `
         <p>${taskText}</p>
+
         <div class="buttons">
             <button class="com">Completed</button>
+            <button class="update">Update</button>
             <button class="del">Delete</button>
         </div>
     `;
 
-    // Add task to the page
-    container.appendChild(task);
+    // Insert BEFORE journal button
+    const journalSection = document.querySelector(".journal-section");
+    container.insertBefore(task, journalSection);
 
-    // Clear input box
     input.value = "";
 
-    // Select buttons inside the new task
+    attachEvents(task);
+}
+
+// -----------------------------
+// Attach button events
+// -----------------------------
+function attachEvents(task) {
+
     const completeBtn = task.querySelector(".com");
+    const updateBtn = task.querySelector(".update");
     const deleteBtn = task.querySelector(".del");
 
-    // Mark task as completed
+    // -------------------------
+    // Completed
+    // -------------------------
     completeBtn.addEventListener("click", function () {
-        task.querySelector("p").style.textDecoration = "line-through";
+
+        task.classList.add("completed");
+
+        // Move task to bottom
+        const journalSection = document.querySelector(".journal-section");
+        container.insertBefore(task, journalSection);
+
+        completeBtn.disabled = true;
+        completeBtn.textContent = "Completed";
     });
 
-    // Delete task
+    // -------------------------
+    // Delete
+    // -------------------------
     deleteBtn.addEventListener("click", function () {
         task.remove();
     });
+
+    // -------------------------
+    // Update
+    // -------------------------
+    updateBtn.addEventListener("click", function () {
+
+        const paragraph = task.querySelector("p");
+
+        const updatedText = prompt(
+            "Update your task:",
+            paragraph.textContent
+        );
+
+        if (updatedText === null) {
+            return;
+        }
+
+        if (updatedText.trim() === "") {
+            alert("Task cannot be empty!");
+            return;
+        }
+
+        paragraph.textContent = updatedText.trim();
+
+    });
+
+}
+
+// -----------------------------
+// Existing dummy tasks
+// -----------------------------
+document.querySelectorAll(".task").forEach(function (task) {
+    attachEvents(task);
 });
 
-// Existing tasks functionality
-const completeButtons = document.querySelectorAll(".com");
-const deleteButtons = document.querySelectorAll(".del");
-
-// Completed button for existing tasks
-completeButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
-        const taskText = button.parentElement.previousElementSibling;
-        taskText.style.textDecoration = "line-through";
-    });
-});
-
-// Delete button for existing tasks
-deleteButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
-        button.closest(".task").remove();
-    });
+// -----------------------------
+// Journal Button
+// -----------------------------
+journalBtn.addEventListener("click", function () {
+    window.location.href = "journal.html";
 });
