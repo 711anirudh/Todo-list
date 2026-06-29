@@ -4,7 +4,7 @@ const journalText = document.getElementById("journalText");
 const saveBtn = document.getElementById("saveBtn");
 const backBtn = document.getElementById("backBtn");
 const bgColor = document.getElementById("bgColor");
-
+const clear = document.getElementById("clearBtn");
 
 // ---------------------------
 // Load saved journal
@@ -63,4 +63,11 @@ backBtn.addEventListener("click", function () {
 
     window.location.href = "main.html";
 
+});
+// --------------------
+// Clear button
+// --------------------------
+clear.addEventListener("click",function(){
+    journalText.value = "";
+    localStorage.removeItem("journal");
 });
